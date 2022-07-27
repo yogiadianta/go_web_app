@@ -11,6 +11,8 @@ import (
 	"text/template"
 
 	"github.com/yogiadianta/go_web_app/pkg/config"
+	//"github.com/yogiadianta/go_web_app/pkg/handlers"
+	"github.com/yogiadianta/go_web_app/pkg/models"
 )
 
 var functions = template.FuncMap{} 
@@ -22,8 +24,12 @@ func NewTemplates(a *config.AppConfig){
     app = a
 }
 
+func AddDefaultData(td *models.TemplateData) *models.TemplateData{
+    return td
+}
+
 // renderTemplate is called in the handler function to parse template using html/template
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData ) {
     var tc map[string]*template.Template
 
     if app.UseCache {
@@ -40,7 +46,9 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 
     buf := new(bytes.Buffer)
 
-    _ = t.Execute(buf, nil)
+    td = AddDefaultData(td)
+
+    _ = t.Execute(buf, td)
 
     _, err := buf.WriteTo(w)
     if err != nil{
